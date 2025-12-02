@@ -15,6 +15,8 @@ class PetroleumVRPGenerator:
     """Générateur d'instances réalistes et GARANTIES FAISABLES pour VRP multi-dépôts multi-produits"""
     
     PRODUCTS = ["essence", "gasoil"]
+    max_capacity = 30000  # Capacité maximale d'un camion en litres
+    less_capacity = 15000 # Capacité minimale d'un camion en litres
     
     def __init__(self, seed: int = 42):
         """Initialise le générateur avec une graine aléatoire"""
@@ -58,6 +60,9 @@ class PetroleumVRPGenerator:
                           truck_capacity: int, zone_size: float, demand_range: Tuple[int, int],
                           difficulty: str, **kwargs) -> Dict:
         """Génère une instance complète avec toutes les données et garantit la faisabilité."""
+
+        max_capacity = 30000  # Capacité maximale d'un camion en litres
+        less_capacity = 15000 # Capacité minimale d'un camion en litres
         
         # 1. Préparation des coordonnées
         max_coord = zone_size
@@ -82,17 +87,6 @@ class PetroleumVRPGenerator:
         # Puisque 1 camion ne transporte qu'UN SEUL type de produit par tournée.
         min_total_required_trucks = req_trucks_essence + req_trucks_gasoil
         
-        #generation des camions
-        trucks = []
-        for i in range( min_total_required_trucks):
-            coords = coords_garages.pop(random.randint(0, len(coords_garages)-1))
-            trucks.append({
-                "id": f"D{i+1}",
-                "name": f"trucks_{i+1}",
-                "coordinates": {"x": coords[0], "y": coords[1]},
-                "index": n_garages + i
-                "capacity"
-            })
 
         # Ajout d'une petite marge pour que le problème soit optimisable (non trivial)
         # Easy: 20% de marge
@@ -115,6 +109,17 @@ class PetroleumVRPGenerator:
         n_trucks = max(n_trucks, 2)
         n_trucks = max(n_trucks, min_total_required_trucks)
 
+        # Generation des camions
+        trucks = []
+        for i in range( min_total_required_trucks):
+            coords = coords_garages.pop(random.randint(0, len(coords_garages)-1))
+            trucks.append({
+                "id": f"D{i+1}",
+                "name": f"trucks_{i+1}",
+                "coordinates": {"x": coords[0], "y": coords[1]},
+                # "index": n_garages + i,
+                "capacity": random.randint(less_capacity, max_capacity)
+                })
 
         # 5. Construction des listes de lieux
         
@@ -176,12 +181,13 @@ class PetroleumVRPGenerator:
                 "n_depots": n_depots,
                 "n_stations": n_stations,
                 "n_trucks": n_trucks, # Nombre de camions garanti faisable
-                "truck_capacity": truck_capacity,
+                # "truck_capacity": truck_capacity,
                 "products": self.PRODUCTS
             },
             "garages": garages,
             "depots": depots,
             "stations": stations,
+            "trucks": trucks,
             "distance_matrix": distance_matrix_list,
             "statistics": {
                 "total_demand_essence": total_demand_essence,
