@@ -80,8 +80,8 @@ class PetroleumVRPGenerator:
         total_demand_gasoil = sum(d["gasoil"] for d in station_demands)
 
         # 4. GARANTIE DE FAISABILITÉ : Calculer le nombre minimal de camions requis
-        req_trucks_essence = self._calculate_required_trucks(total_demand_essence, truck_capacity)
-        req_trucks_gasoil = self._calculate_required_trucks(total_demand_gasoil, truck_capacity)
+        req_trucks_essence = self._calculate_required_trucks(total_demand_essence, max_capacity)
+        req_trucks_gasoil = self._calculate_required_trucks(total_demand_gasoil, max_capacity)
         
         # Le nombre minimal de camions est la somme des besoins par produit
         # Puisque 1 camion ne transporte qu'UN SEUL type de produit par tournée.
