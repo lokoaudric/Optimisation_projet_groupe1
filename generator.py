@@ -111,7 +111,7 @@ class PetroleumVRPGenerator:
 
         # Generation des camions
         trucks = []
-        for i in range( min_total_required_trucks):
+        for i in range( n_trucks):
             coords = coords_garages.pop(random.randint(0, len(coords_garages)-1))
             trucks.append({
                 "id": f"D{i+1}",
